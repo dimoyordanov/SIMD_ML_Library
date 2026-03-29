@@ -27,7 +27,7 @@ if(NOT ISPC_EXECUTABLE)
 endif()
 message(STATUS "ISPC compiler: ${ISPC_EXECUTABLE}")
 
-set(ISPC_TARGET "avx512" CACHE STRING
+set(ISPC_TARGET "avx" CACHE STRING
     "ISPC SIMD target architecture (e.g. avx, avx2, sse4)")
 
 set(ISPC_GENERATED_DIR "${CMAKE_BINARY_DIR}/ispc_generated")
