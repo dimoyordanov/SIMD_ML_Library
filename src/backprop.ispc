@@ -1,13 +1,3 @@
-// Gradient kernels for backpropagation.
-//
-// Convention: every backward function receives the upstream gradient
-// (grad_output) and writes the downstream gradient (grad_input).
-// Activation backwards also receive the pre-computed forward output so
-// the expensive transcendental is not repeated.
-
-// ------------------------------------------------------------------ activations
-
-// ReLU: grad flows through where input > 0, is blocked otherwise.
 export void relu_backward(uniform float grad_output[],
                           uniform float input[],
                           uniform float grad_input[],

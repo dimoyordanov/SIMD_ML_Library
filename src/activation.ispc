@@ -15,9 +15,8 @@ export void sigmoid(uniform float input[],
 }
 
 double tanh(double x) {
-    double e_pos = exp(x);
-    double e_neg = exp(-x);
-    return (e_pos - e_neg) / (e_pos + e_neg);
+    double e_pos = exp(2*x);
+    return (e_pos - 1) / (e_pos + 1);
 }
 
 export void tanh_activation(uniform float input[],

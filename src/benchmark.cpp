@@ -1,4 +1,5 @@
 #include "activation.h"
+#include "backprop.h"
 #include "linear.h"
 #include "loss.h"
 
@@ -157,6 +158,103 @@ static void benchmark_speedup() {
 }
 
 
+static void benchmark_backprop_speedup() {
+    constexpr int N = 1 << 20;
+
+    auto inp  = random_vec(N, -1.0f, 1.0f, time(0));
+    auto inp2 = random_vec(N,  0.0f, 1.0f, time(0) + 1);  // post-activation range
+    std::vector<float> out(N);
+
+    std::printf("\n=== Backprop ISPC vs scalar speedup  (N=%d) ===\n\n", N);
+    print_speedup_header();
+
+    // relu_backward
+    {
+        auto scalar_us = time_us([&] {
+            for (int i = 0; i < N; ++i)
+                out[i] = inp[i] > 0.0f ? inp2[i] : 0.0f;
+        });
+        auto ispc_us = time_us([&] {
+            ispc::relu_backward(inp2.data(), inp.data(), out.data(), N);
+        });
+        print_speedup_row("relu_backward", scalar_us, ispc_us);
+    }
+
+    // sigmoid_backward
+    {
+        auto scalar_us = time_us([&] {
+            for (int i = 0; i < N; ++i)
+                out[i] = inp2[i] * inp[i] * (1.0f - inp[i]);
+        });
+        auto ispc_us = time_us([&] {
+            ispc::sigmoid_backward(inp2.data(), inp.data(), out.data(), N);
+        });
+        print_speedup_row("sigmoid_backward", scalar_us, ispc_us);
+    }
+
+    // tanh_backward
+    {
+        auto scalar_us = time_us([&] {
+            for (int i = 0; i < N; ++i)
+                out[i] = inp2[i] * (1.0f - inp[i] * inp[i]);
+        });
+        auto ispc_us = time_us([&] {
+            ispc::tanh_backward(inp2.data(), inp.data(), out.data(), N);
+        });
+        print_speedup_row("tanh_backward", scalar_us, ispc_us);
+    }
+
+    // mse_backward
+    {
+        auto scalar_us = time_us([&] {
+            for (int i = 0; i < N; ++i)
+                out[i] = 2.0f * (inp[i] - inp2[i]) / static_cast<float>(N);
+        });
+        auto ispc_us = time_us([&] {
+            ispc::mse_backward(inp.data(), inp2.data(), out.data(), N);
+        });
+        print_speedup_row("mse_backward", scalar_us, ispc_us);
+    }
+
+    // matmul_backward_A  512×512
+    {
+        constexpr int M = 512, K = 512;
+        auto dC = random_vec(M * 1,   -1.0f, 1.0f, time(0));
+        auto B  = random_vec(K * 1,   -1.0f, 1.0f, time(0) + 1);
+        std::vector<float> dA(M * K);
+
+        auto scalar_us = time_us([&] {
+            for (int r = 0; r < M; ++r)
+                for (int c = 0; c < K; ++c)
+                    dA[r * K + c] = dC[r] * B[c];
+        });
+        auto ispc_us = time_us([&] {
+            ispc::matmul_backward_A(dC.data(), B.data(), dA.data(), M, 1, K);
+        });
+        print_speedup_row("matmul_backward_A 512", scalar_us, ispc_us);
+    }
+
+    // matmul_backward_B  512×512
+    {
+        constexpr int M = 512, K = 512;
+        auto A  = random_vec(M * K, -1.0f, 1.0f, time(0));
+        auto dC = random_vec(M * 1, -1.0f, 1.0f, time(0) + 1);
+        std::vector<float> dB(K * 1);
+
+        auto scalar_us = time_us([&] {
+            for (int r = 0; r < K; ++r) {
+                float s = 0.0f;
+                for (int m = 0; m < M; ++m) s += A[m * K + r] * dC[m];
+                dB[r] = s;
+            }
+        });
+        auto ispc_us = time_us([&] {
+            ispc::matmul_backward_B(A.data(), dC.data(), dB.data(), M, 1, K);
+        });
+        print_speedup_row("matmul_backward_B 512", scalar_us, ispc_us);
+    }
+}
+
 static void benchmark_cache_sensitivity() {
     const std::vector<int> sizes = {
         1 << 10,
@@ -201,6 +299,7 @@ static void benchmark_cache_sensitivity() {
 
 int main() {
     benchmark_speedup();
+    benchmark_backprop_speedup();
     benchmark_cache_sensitivity();
     std::printf("\n");
     return 0;

@@ -21,3 +21,7 @@ add_ml_test(test_activation test_activation.cpp)
 add_ml_test(test_linear     test_linear.cpp)
 add_ml_test(test_loss       test_loss.cpp)
 add_ml_test(test_backprop   test_backprop.cpp)
+
+# Model-builder tests (link ml_model, which transitively brings ml_kernels)
+add_ml_test(test_model     test_model.cpp     ml_model)
+add_ml_test(test_weight_io test_weight_io.cpp ml_model)

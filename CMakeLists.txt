@@ -27,7 +27,7 @@ if(NOT ISPC_EXECUTABLE)
 endif()
 message(STATUS "ISPC compiler: ${ISPC_EXECUTABLE}")
 
-set(ISPC_TARGET "avx" CACHE STRING
+set(ISPC_TARGET "avx512" CACHE STRING
     "ISPC SIMD target architecture (e.g. avx, avx2, sse4)")
 
 set(ISPC_GENERATED_DIR "${CMAKE_BINARY_DIR}/ispc_generated")
@@ -78,6 +78,18 @@ add_ispc_library(ml_kernels
 )
 
 # ------------------------------------------------------------------
+# C++ model-builder library
+# ------------------------------------------------------------------
+add_library(ml_model STATIC
+    src/model.h
+    src/model.cpp
+    src/weight_io.h
+    src/weight_io.cpp
+)
+target_include_directories(ml_model PUBLIC src)
+target_link_libraries(ml_model PUBLIC ml_kernels)
+
+# ------------------------------------------------------------------
 # Executables
 # ------------------------------------------------------------------
 add_executable(benchmark  src/benchmark.cpp)
@@ -85,6 +97,9 @@ add_executable(run_model  src/run_model.cpp)
 
 target_link_libraries(benchmark  PRIVATE ml_kernels)
 target_link_libraries(run_model  PRIVATE ml_kernels)
+
+add_executable(train_xor  example/train_xor.cpp)
+target_link_libraries(train_xor PRIVATE ml_model)
 
 # ------------------------------------------------------------------
 # GoogleTest (mirrors Projects/Filesystem convention)
