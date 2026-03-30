@@ -27,8 +27,16 @@ if(NOT ISPC_EXECUTABLE)
 endif()
 message(STATUS "ISPC compiler: ${ISPC_EXECUTABLE}")
 
-set(ISPC_TARGET "avx" CACHE STRING
-    "ISPC SIMD target architecture (e.g. avx, avx2, sse4)")
+#neon-i16x16, neon-i16x8,  neon-i32x4, neon-i32x8, neon-i8x16, neon-i8x32
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64|arm64")
+    set(ISPC_TARGET "neon-i8x16" CACHE STRING
+        "ISPC SIMD target architecture (e.g. avx, avx2, sse4)")
+elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64|amd64|x86")
+    set(ISPC_TARGET "avx" CACHE STRING
+        "ISPC SIMD target architecture (e.g. avx, avx2, sse4)")
+else()
+    message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")
+endif()
 
 set(ISPC_GENERATED_DIR "${CMAKE_BINARY_DIR}/ispc_generated")
 file(MAKE_DIRECTORY "${ISPC_GENERATED_DIR}")
