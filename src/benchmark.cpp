@@ -32,14 +32,15 @@ static std::vector<float> random_vec(int n, float lo = -1.0f, float hi = 1.0f,
 }
 
 static void print_speedup_header() {
-    std::printf("%-22s  %10s  %10s  %8s\n",
+    std::printf("| %-22s | %10s | %10s | %8s |\n",
                 "kernel", "scalar(us)", "ispc(us)", "speedup");
-    std::printf("%s\n", std::string(56, '-').c_str());
+    std::printf("| %s | %s | %s | %s |\n", std::string(22, '-').c_str(), std::string(10, '-').c_str(),
+                std::string(10, '-').c_str(), std::string(8, '-').c_str());
 }
 
 static void print_speedup_row(const char* name,
                                double scalar_us, double ispc_us) {
-    std::printf("%-22s  %10.2f  %10.2f  %7.2fx\n",
+    std::printf("| %-22s | %10.2f | %10.2f | %7.2fx |\n",
                 name, scalar_us, ispc_us, scalar_us / ispc_us - 1);
 }
 
