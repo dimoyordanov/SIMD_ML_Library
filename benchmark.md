@@ -3,7 +3,7 @@
 There were 10 executions for each entry
 
 ## avx512spr-x64
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      87.31 |      70.47 |    0.24x |
 | sigmoid                |    2316.29 |     192.25 |   11.05x |
@@ -16,7 +16,7 @@ There were 10 executions for each entry
 
 ## avx512spr-x32
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      81.35 |      63.21 |    0.29x |
 | sigmoid                |    2308.63 |     195.76 |   10.79x |
@@ -29,7 +29,7 @@ There were 10 executions for each entry
 ## avx512spr-x16
 
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      76.00 |      68.53 |    0.11x |
 | sigmoid                |    2345.21 |     203.49 |   10.52x |
@@ -41,7 +41,7 @@ There were 10 executions for each entry
 
 ## avx512spr-x8
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      74.01 |      64.98 |    0.14x |
 | sigmoid                |    2301.71 |     239.11 |    8.63x |
@@ -53,7 +53,7 @@ There were 10 executions for each entry
 
 ## avx512gnr-x64
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      76.14 |      64.22 |    0.19x |
 | sigmoid                |    2307.72 |     193.32 |   10.94x |
@@ -65,7 +65,7 @@ There were 10 executions for each entry
 
 ## avx512gnr-x32
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      92.33 |      63.01 |    0.47x |
 | sigmoid                |    2309.10 |     195.70 |   10.80x |
@@ -77,7 +77,7 @@ There were 10 executions for each entry
 
 ## avx512gnr-x16
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      83.45 |      68.50 |    0.22x |
 | sigmoid                |    2339.38 |     203.14 |   10.52x |
@@ -89,7 +89,7 @@ There were 10 executions for each entry
 
 ## avx2vnni-i32x16
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      74.95 |      71.14 |    0.05x |
 | sigmoid                |    2316.61 |     323.86 |    6.15x |
@@ -101,7 +101,7 @@ There were 10 executions for each entry
 
 ## avx2vnni-i32x8
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      82.35 |      65.76 |    0.25x |
 | sigmoid                |    2308.50 |     257.11 |    7.98x |
@@ -113,7 +113,7 @@ There were 10 executions for each entry
 
 ## avx2vnni-i32x4
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      77.60 |      60.49 |    0.28x |
 | sigmoid                |    2308.17 |     508.32 |    3.54x |
@@ -137,9 +137,20 @@ There were 10 executions for each entry
 |matmul 512x512      |     148412.02  |  10328.95  |  13.37x |
 |mse_loss            |        101.47  |    109.90  |  -0.08x |
 
+| size (floats)  |      bytes |    ispc (us) |  ispc (GB/s) |
+| -------------- | ---------- | ------------ | ------------ |
+|     1024 floats |    8192.00 |         0.05 |       155.89 |
+|     4096 floats |   32768.00 |         0.18 |       181.47 |
+|    16384 floats |  131072.00 |         0.69 |       189.44 |
+|    65536 floats |  524288.00 |         5.63 |        93.16 |
+|   262144 floats | 2097152.00 |        23.50 |        89.23 |
+|  1048576 floats | 8388608.00 |        91.70 |        91.48 |
+|  4194304 floats | 33554432.00 |       721.19 |        46.53 |
+| 16777216 floats | 134217728.00 |      2632.85 |        50.98 |
+
 ## neon-i16x8
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |     120.86 |      96.76 |    0.25x |
 | sigmoid                |    2081.63 |     591.63 |    2.52x |
@@ -151,7 +162,7 @@ There were 10 executions for each entry
 
 ## neon-i32x4
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |      98.30 |      90.83 |    0.08x |
 | sigmoid                |    2083.39 |     583.90 |    2.57x |
@@ -163,7 +174,7 @@ There were 10 executions for each entry
 
 ## neon-i32x8
 
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |     110.65 |      97.18 |    0.14x |
 | sigmoid                |    2153.73 |     674.95 |    2.19x |
@@ -173,8 +184,8 @@ There were 10 executions for each entry
 | matmul 512x512         |  165167.24 |   20146.90 |    7.20x |
 | mse_loss               |     146.70 |     191.67 |   -0.23x |
 ## neon-i8x16
-
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+### Speed
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |     147.64 |     126.85 |    0.16x |
 | sigmoid                |    2477.58 |     587.98 |    3.21x |
@@ -183,11 +194,21 @@ There were 10 executions for each entry
 | dot_product            |    1699.60 |     318.95 |    4.33x |
 | matmul 512x512         |  168127.39 |   11212.72 |   13.99x |
 | mse_loss               |     261.75 |     135.77 |    0.93x |
-
+### Cache
+| size (floats)  |      bytes |    ispc (us) |  ispc (GB/s) |
+| -------------- | ---------- | ------------ | ------------ |
+|     1024 floats |    8192.00 |         0.08 |       101.55 |
+|     4096 floats |   32768.00 |         0.19 |       171.06 |
+|    16384 floats |  131072.00 |         0.68 |       193.90 |
+|    65536 floats |  524288.00 |         5.64 |        93.02 |
+|   262144 floats | 2097152.00 |        23.52 |        89.18 |
+|  1048576 floats | 8388608.00 |        91.48 |        91.69 |
+|  4194304 floats | 33554432.00 |       621.52 |        53.99 |
+| 16777216 floats | 134217728.00 |      2653.90 |        50.57 |
 
 ## neon-i8x32
-
-| kernel                 | scalar(us) |   ispc(us) |  speedup |
+### Speed
+| function                 | scalar(us) |   ispc(us) |  speedup |
 | ---------------------- | ---------- | ---------- | -------- |
 | relu                   |     141.87 |     154.93 |   -0.08x |
 | sigmoid                |    2771.19 |     664.83 |    3.17x |
@@ -196,3 +217,15 @@ There were 10 executions for each entry
 | dot_product            |    1196.22 |     166.88 |    6.17x |
 | matmul 512x512         |  167631.28 |   10735.52 |   14.61x |
 | mse_loss               |     180.36 |     139.70 |    0.29x |
+
+### Cache
+| size (floats)  |      bytes |    ispc (us) |  ispc (GB/s) |
+| -------------- | ---------- | ------------ | ------------ |
+|     1024 floats |    8192.00 |         0.05 |       157.70 |
+|     4096 floats |   32768.00 |         0.19 |       173.62 |
+|    16384 floats |  131072.00 |         0.67 |       194.57 |
+|    65536 floats |  524288.00 |         5.83 |        89.93 |
+|   262144 floats | 2097152.00 |        22.21 |        94.41 |
+|  1048576 floats | 8388608.00 |       107.82 |        77.80 |
+|  4194304 floats | 33554432.00 |       594.99 |        56.39 |
+| 16777216 floats | 134217728.00 |      2574.12 |        52.14 |

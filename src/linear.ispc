@@ -27,6 +27,51 @@ export void matmul(uniform float A[],
     }
 }
 
+#define TILE_HEIGHT 32
+#define TILE_WIDTH 32
+
+export void matmul2(uniform float A[],
+                   uniform float B[],
+                   uniform float C[],
+                   uniform int M,
+                   uniform int N,
+                   uniform int K) {
+    if (M < TILE_HEIGHT || N < TILE_WIDTH) {
+        matmul(A, B, C, M, N, K);
+        return;
+    }
+    uniform float sumTile[TILE_HEIGHT][TILE_WIDTH];
+    uniform float avals[TILE_HEIGHT];
+
+    for (uniform unsigned int m = 0; m < M; m += TILE_HEIGHT) {
+        for (uniform unsigned int n0 = 0; n0 < N; n0 += TILE_WIDTH) {
+            foreach (ni = 0 ... TILE_WIDTH) {
+                for (uniform unsigned int i = 0; i < TILE_HEIGHT; i++) {
+                    sumTile[i][ni] = 0.0f;
+                }
+            }
+            for (uniform unsigned int k = 0; k < K; k++) {
+                for (uniform unsigned int i = 0; i < TILE_HEIGHT; i++)
+                    avals[i] = A[(m + i) * K + k];
+
+                
+                foreach (nt = 0 ... TILE_WIDTH) {
+                        
+                    varying float B1 = B[k * N + n0 + nt];
+                    for (uniform unsigned int i = 0; i < TILE_HEIGHT; i++) {    
+                        sumTile[i][nt] += avals[i] * B1;
+                    }
+                }
+            }
+            foreach (ni = 0 ... TILE_WIDTH) {
+                for (uniform unsigned int i = 0; i < TILE_HEIGHT; i++) {
+                    C[(m + i) * N + n0 + ni] = sumTile[i][ni];
+                }
+            }
+        }
+    }
+}
+
 export void add_vector(uniform float output[],
                        uniform float b[],
                        uniform int n) {

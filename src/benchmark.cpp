@@ -31,11 +31,27 @@ static std::vector<float> random_vec(int n, float lo = -1.0f, float hi = 1.0f,
     return v;
 }
 
-static void print_speedup_header() {
-    std::printf("| %-22s | %10s | %10s | %8s |\n",
-                "kernel", "scalar(us)", "ispc(us)", "speedup");
+static void print_speedup_header(int N = 1 << 20) {
+    std::printf("\n=== ISPC vs scalar speedup  (N=%d) ===\n\n", N);
+    std::printf("| %-22s | %10s | %10s | %7s |\n",
+                "function", "scalar(us)", "ispc(us)", "speedup");
     std::printf("| %s | %s | %s | %s |\n", std::string(22, '-').c_str(), std::string(10, '-').c_str(),
                 std::string(10, '-').c_str(), std::string(8, '-').c_str());
+}
+
+static void print_cache_sensitivity_header() {
+    std::printf("\n=== Cache-size sensitivity: ReLU throughput ===\n");
+    std::printf("(reads input[] + writes output[] = 2 arrays × float = 8 bytes/elem)\n\n");
+    std::printf("| %-14s | %10s | %12s | %12s |\n",
+                "size (floats)", "bytes", "ispc (us)", "ispc (GB/s)");
+    std::printf("| %s | %s | %s | %s |\n", std::string(14, '-').c_str(), std::string(10, '-').c_str(),
+                std::string(12, '-').c_str(), std::string(12, '-').c_str());
+}
+
+static void print_cache_sensitivity_row(int size, const char* name,
+                                        double bytes, double ispc_us, double gbs) {
+    std::printf("| %8d %-5s | %10.2f | %12.2f | %12.2f |\n",
+                size, name, bytes, ispc_us, gbs);
 }
 
 static void print_speedup_row(const char* name,
@@ -51,7 +67,6 @@ static void benchmark_speedup() {
     auto inp2 = random_vec(N, -1.0f, 1.0f, time(0) + 1);
     std::vector<float> out(N);
 
-    std::printf("\n=== ISPC vs scalar speedup  (N=%d) ===\n\n", N);
     print_speedup_header();
 
     // relu
@@ -138,6 +153,28 @@ static void benchmark_speedup() {
             ispc::matmul(A.data(), B.data(), C.data(), M, M, K);
         });
         print_speedup_row("matmul 512x512", scalar_us, ispc_us);
+    }
+
+    // matmul2 512x512
+    {
+        constexpr int M = 512, K = 512;
+        auto A = random_vec(M * K, -1.0f, 1.0f, time(0));
+        auto B = random_vec(K * M, -1.0f, 1.0f, time(0) + 1);
+        std::vector<float> C(M * M);
+
+        auto scalar_us = time_us([&] {
+            for (int r = 0; r < M; ++r)
+                for (int c = 0; c < M; ++c) {
+                    float s = 0.0f;
+                    for (int k = 0; k < K; ++k)
+                        s += A[r * K + k] * B[k * M + c];
+                    C[r * M + c] = s;
+                }
+        });
+        auto ispc_us = time_us([&] {
+            ispc::matmul2(A.data(), B.data(), C.data(), M, M, K);
+        });
+        print_speedup_row("matmul2 512x512", scalar_us, ispc_us);
     }
 
     // mse_loss
@@ -268,11 +305,7 @@ static void benchmark_cache_sensitivity() {
         1 << 24,
     };
 
-    std::printf("\n=== Cache-size sensitivity: ReLU throughput ===\n");
-    std::printf("(reads input[] + writes output[] = 2 arrays × float = 8 bytes/elem)\n\n");
-    std::printf("%-14s  %10s  %12s  %12s\n",
-                "size (floats)", "bytes", "ispc (us)", "ispc (GB/s)");
-    std::printf("%s\n", std::string(54, '-').c_str());
+    print_cache_sensitivity_header();
 
     for (int n : sizes) {
         auto inp = random_vec(n, -1.0f, 1.0f, time(0));
@@ -289,11 +322,7 @@ static void benchmark_cache_sensitivity() {
         double gb_per_s = (bytes_transferred / 1e9) / (us / 1e6);
 
         const char* unit = "floats";
-        std::printf("%-6d %-7s  %10.0f  %12.2f  %12.2f\n",
-                    n, unit,
-                    static_cast<double>(n) * sizeof(float),
-                    us,
-                    gb_per_s);
+        print_cache_sensitivity_row(n, unit, bytes_transferred, us, gb_per_s);
     }
 }
 
