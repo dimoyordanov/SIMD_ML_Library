@@ -27,8 +27,8 @@ export void matmul(uniform float A[],
     }
 }
 
-#define TILE_HEIGHT 32
-#define TILE_WIDTH 32
+#define TILE_HEIGHT 8
+#define TILE_WIDTH 8   
 
 export void matmul2(uniform float A[],
                    uniform float B[],
