@@ -15,7 +15,7 @@
 using Clock = std::chrono::steady_clock;
 
 template <typename Fn>
-double time_us(Fn&& fn, int reps = 10) {
+double time_us(Fn&& fn, int reps = 100) {
     auto t0 = Clock::now();
     for (int i = 0; i < reps; ++i) fn();
     auto t1 = Clock::now();
@@ -58,6 +58,10 @@ static void print_speedup_row(const char* name,
                                double scalar_us, double ispc_us) {
     std::printf("| %-22s | %10.2f | %10.2f | %7.2fx |\n",
                 name, scalar_us, ispc_us, scalar_us / ispc_us - 1);
+}
+
+double predictDoubleHomePC(int x) {
+    return 182835.96*(x-1024)*(x-2048)/((-512)*(-512-1024)) + 3366705.21*(x-512)*(x-2048)/((512)*(-1024)) + 36822710.35*(x-512)*(x-1024)/((1024+512)*(1024));
 }
 
 static void benchmark_speedup() {
@@ -162,7 +166,7 @@ static void benchmark_speedup() {
         auto B = random_vec(K * M, -1.0f, 1.0f, time(0) + 1);
         std::vector<float> C(M * M);
 
-        auto scalar_us = time_us([&] {
+        auto scalar_us =  time_us([&] {
             for (int r = 0; r < M; ++r)
                 for (int c = 0; c < M; ++c) {
                     float s = 0.0f;
@@ -177,6 +181,40 @@ static void benchmark_speedup() {
         print_speedup_row("matmul2 512x512", scalar_us, ispc_us);
     }
 
+    // // matmul2 2048x2048
+    // {
+    //     constexpr int M = 2048, K = 2048;
+    //     auto A = random_vec(M * K, -1.0f, 1.0f, time(0));
+    //     auto B = random_vec(K * M, -1.0f, 1.0f, time(0) + 1);
+    //     std::vector<float> C(M * M);
+
+    //     auto scalar_us =  time_us([&] {
+    //         for (int r = 0; r < M; ++r)
+    //             for (int c = 0; c < M; ++c) {
+    //                 float s = 0.0f;
+    //                 for (int k = 0; k < K; ++k)
+    //                     s += A[r * K + k] * B[k * M + c];
+    //                 C[r * M + c] = s;
+    //             }
+    //     });
+    //     auto ispc_us = time_us([&] {
+    //         ispc::matmul2(A.data(), B.data(), C.data(), M, M, K);
+    //     }, 10);
+    //     print_speedup_row("matmul2 2048x2048", scalar_us, ispc_us);
+    // }
+    // // matmul2 2048x2048
+    // {
+    //     constexpr int M = 4096, K = 4096;
+    //     auto A = random_vec(M * K, -1.0f, 1.0f, time(0));
+    //     auto B = random_vec(K * M, -1.0f, 1.0f, time(0) + 1);
+    //     std::vector<float> C(M * M);
+
+    //     auto scalar_us = predictDoubleHomePC(4096) ; // pre-measured to avoid long runtime
+    //     auto ispc_us = time_us([&] {
+    //         ispc::matmul2(A.data(), B.data(), C.data(), M, M, K);
+    //     }, 10);
+    //     print_speedup_row("matmul2 4096x4096", scalar_us, ispc_us);
+    // }
     // mse_loss
     {
         float result{};

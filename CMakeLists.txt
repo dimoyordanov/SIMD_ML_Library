@@ -31,8 +31,9 @@ message(STATUS "ISPC compiler: ${ISPC_EXECUTABLE}")
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64|arm64")
     set(ISPC_TARGET "neon-i32x8" CACHE STRING
         "ISPC SIMD target architecture (e.g. avx, avx2, sse4)")
+# avx512spr-x64
 elseif(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64|amd64|x86")
-    set(ISPC_TARGET "avx512spr-x64" CACHE STRING
+    set(ISPC_TARGET "avx512spr-x32" CACHE STRING
         "ISPC SIMD target architecture (e.g. avx, avx2, sse4)")
 else()
     message(FATAL_ERROR "Unsupported architecture: ${CMAKE_SYSTEM_PROCESSOR}")

@@ -27,8 +27,23 @@ export void matmul(uniform float A[],
     }
 }
 
+
+#if TARGET_WIDTH == 2
+#define TILE_WIDTH 4
+#elif TARGET_WIDTH == 4
+#define TILE_WIDTH 8
+#elif TARGET_WIDTH == 8
+#define TILE_WIDTH 16
+#elif TARGET_WIDTH == 16
+#define TILE_WIDTH 32
+#elif TARGET_WIDTH == 32
+#define TILE_WIDTH 64
+#elif TARGET_WIDTH == 64
+#define TILE_WIDTH 128
+#else
+#error "Unsupported target width"
+#endif
 #define TILE_HEIGHT 8
-#define TILE_WIDTH 8   
 
 export void matmul2(uniform float A[],
                    uniform float B[],
